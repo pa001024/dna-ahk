@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 
-#Include emgui.ahk
+#Include dnagui.ahk
 
 GuiMain.Init()
 class GuiMain {
@@ -13,17 +13,17 @@ class GuiMain {
     }
 
     static ShowMain() {
-        if EMGui.visible {
-            EMGui.Close()
-            IniWrite(0, "em-ahk.ini", "gui", "show")
+        if DNAGui.visible {
+            DNAGui.Close()
+            IniWrite(0, "dna-ahk.ini", "gui", "show")
         } else {
-            EMGui.Show()
-            IniWrite(1, "em-ahk.ini", "gui", "show")
+            DNAGui.Show()
+            IniWrite(1, "dna-ahk.ini", "gui", "show")
         }
     }
 
     static Load() {
-        if showCounter := IniRead("em-ahk.ini", "gui", "show", 0)
+        if showCounter := IniRead("dna-ahk.ini", "gui", "show", 0)
             this.ShowMain()
     }
 }

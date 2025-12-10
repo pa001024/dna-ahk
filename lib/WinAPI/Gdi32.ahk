@@ -8,7 +8,27 @@ AnimatePalette(hpal, iStartIndex, cEntries, ppe) => DllCall('Gdi32\AnimatePalett
 Arc(hdc, nLeftRect, nTopRect, nRightRect, nBottomRect, nXStartArc, nYStartArc, nXEndArc, nYEndArc) => DllCall('Gdi32\Arc', 'ptr', hdc, 'int', nLeftRect, 'int', nTopRect, 'int', nRightRect, 'int', nBottomRect, 'int', nXStartArc, 'int', nYStartArc, 'int', nXEndArc, 'int', nYEndArc, 'int')
 ArcTo(hdc, nLeftRect, nTopRect, nRightRect, nBottomRect, nXRadial1, nYRadial1, nXRadial2, nYRadial2) => DllCall('Gdi32\ArcTo', 'ptr', hdc, 'int', nLeftRect, 'int', nTopRect, 'int', nRightRect, 'int', nBottomRect, 'int', nXRadial1, 'int', nYRadial1, 'int', nXRadial2, 'int', nYRadial2, 'int')
 BeginPath(hdc) => DllCall('Gdi32\BeginPath', 'ptr', hdc, 'int')
-BitBlt(hdcDest, nXDest, nYDest, nWidth, nHeight, hdcSrc, nXSrc, nYSrc, dwRop) => DllCall('Gdi32\BitBlt', 'ptr', hdcDest, 'int', nXDest, 'int', nYDest, 'int', nWidth, 'int', nHeight, 'ptr', hdcSrc, 'int', nXSrc, 'int', nYSrc, 'uint', dwRop, 'int')
+BitBlt(ddc, dx, dy, dw, dh, sdc, sx, sy, Raster := "") {
+	; BLACKNESS				= 0x00000042
+	; NOTSRCERASE			= 0x001100A6
+	; NOTSRCCOPY			= 0x00330008
+	; SRCERASE				= 0x00440328
+	; DSTINVERT				= 0x00550009
+	; PATINVERT				= 0x005A0049
+	; SRCINVERT				= 0x00660046
+	; SRCAND				= 0x008800C6
+	; MERGEPAINT			= 0x00BB0226
+	; MERGECOPY				= 0x00C000CA
+	; SRCCOPY				= 0x00CC0020
+	; SRCPAINT				= 0x00EE0086
+	; PATCOPY				= 0x00F00021
+	; PATPAINT				= 0x00FB0A09
+	; WHITENESS				= 0x00FF0062
+	; CAPTUREBLT			= 0x40000000
+	; NOMIRRORBITMAP		= 0x80000000
+	return DllCall("Gdi32\BitBlt", "Ptr", dDC, "int", dx, "int", dy, "int", dw, "int", dh
+		, "Ptr", sDC, "int", sx, "int", sy, "Uint", Raster ? Raster : 0x00CC0020)
+}
 CancelDC(hdc) => DllCall('Gdi32\CancelDC', 'ptr', hdc, 'int')
 CheckColorsInGamut(hDC, lpRGBTriples, lpBuffer, nCount) => DllCall('Gdi32\CheckColorsInGamut', 'ptr', hDC, 'ptr', lpRGBTriples, 'ptr', lpBuffer, 'uint', nCount, 'int')
 ChoosePixelFormat(hdc, ppfd) => DllCall('Gdi32\ChoosePixelFormat', 'ptr', hdc, 'ptr', ppfd, 'int')
@@ -26,12 +46,24 @@ CreateBitmap(nWidth, nHeight, cPlanes, cBitsPerPel, lpvBits) => DllCall('Gdi32\C
 CreateBitmapIndirect(lpbm) => DllCall('Gdi32\CreateBitmapIndirect', 'ptr', lpbm, 'ptr')
 CreateBrushIndirect(lplb) => DllCall('Gdi32\CreateBrushIndirect', 'ptr', lplb, 'ptr')
 CreateColorSpace(lpLogColorSpace) => DllCall('Gdi32\CreateColorSpace', 'ptr', lpLogColorSpace, 'ptr')
-CreateCompatibleBitmap(hdc, nWidth, nHeight) => DllCall('Gdi32\CreateCompatibleBitmap', 'ptr', hdc, 'int', nWidth, 'int', nHeight, 'ptr')
-CreateCompatibleDC(hdc) => DllCall('Gdi32\CreateCompatibleDC', 'ptr', hdc, 'ptr')
+CreateCompatibleDC(hdc := 0) => DllCall('Gdi32\CreateCompatibleDC', 'ptr', hdc, 'ptr')
 CreateDC(lpszDriver, lpszDevice, lpszOutput, lpInitData) => DllCall('Gdi32\CreateDC', 'str', lpszDriver, 'str', lpszDevice, 'str', lpszOutput, 'ptr', lpInitData, 'ptr')
 CreateDIBPatternBrush(hglbDIBPacked, fuColorSpec) => DllCall('Gdi32\CreateDIBPatternBrush', 'ptr', hglbDIBPacked, 'uint', fuColorSpec, 'ptr')
 CreateDIBPatternBrushPt(lpPackedDIB, iUsage) => DllCall('Gdi32\CreateDIBPatternBrushPt', 'ptr', lpPackedDIB, 'uint', iUsage, 'ptr')
-CreateDIBSection(hdc, pbmi, iUsage, ppvBits, hSection, dwOffset) => DllCall('Gdi32\CreateDIBSection', 'ptr', hdc, 'ptr', pbmi, 'uint', iUsage, 'ptr', ppvBits, 'ptr', hSection, 'uint', dwOffset, 'ptr')
+CreateCompatibleBitmap(hdc, w, h) => DllCall("gdi32\CreateCompatibleBitmap", "Ptr", hdc, "int", w, "int", h)
+
+CreateDIBSection(w, h, hdc := "", bpp := 32, &ppvBits := 0) {
+	hdc2 := hdc ? hdc : GetDC()
+	bi := Buffer(40, 0)
+
+	NumPut("int", 40, "int", Integer(w), "int", Integer(h), "short", 1, "short", bpp, "int", 0, bi, 0)
+	hbm := DllCall("CreateDIBSection", "Ptr", hdc2, "Ptr", bi, "int", 0, "Ptr*", &ppvBits, "Ptr", 0, "int", 0, "Ptr")
+	if !hdc
+		ReleaseDC(hdc2)
+	return hbm
+}
+
+DeleteObject(hObject) => DllCall("DeleteObject", "Ptr", hObject)
 CreateDIBitmap(hdc, lpbmih, fdwInit, lpbInit, lpbmi, fuUsage) => DllCall('Gdi32\CreateDIBitmap', 'ptr', hdc, 'ptr', lpbmih, 'uint', fdwInit, 'ptr', lpbInit, 'ptr', lpbmi, 'uint', fuUsage, 'ptr')
 CreateDiscardableBitmap(hdc, nWidth, nHeight) => DllCall('Gdi32\CreateDiscardableBitmap', 'ptr', hdc, 'int', nWidth, 'int', nHeight, 'ptr')
 CreateEllipticRgn(nLeftRect, nTopRect, nRightRect, nBottomRect) => DllCall('Gdi32\CreateEllipticRgn', 'int', nLeftRect, 'int', nTopRect, 'int', nRightRect, 'int', nBottomRect, 'ptr')
@@ -63,10 +95,8 @@ DDCCISaveCurrentSettings(hMonitor) => DllCall('Gdi32\DDCCISaveCurrentSettings', 
 DDCCISetVCPFeature(hMonitor, dwVCPCode, dwNewValue) => DllCall('Gdi32\DDCCISetVCPFeature', 'ptr', hMonitor, 'uint', dwVCPCode, 'uint', dwNewValue, 'int')
 DPtoLP(hdc, lpPoints, nCount) => DllCall('Gdi32\DPtoLP', 'ptr', hdc, 'ptr', lpPoints, 'int', nCount, 'int')
 DeleteColorSpace(hColorSpace) => DllCall('Gdi32\DeleteColorSpace', 'ptr', hColorSpace, 'int')
-DeleteDC(hdc) => DllCall('Gdi32\DeleteDC', 'ptr', hdc, 'int')
 DeleteEnhMetaFile(hemf) => DllCall('Gdi32\DeleteEnhMetaFile', 'ptr', hemf, 'int')
 DeleteMetaFile(hmf) => DllCall('Gdi32\DeleteMetaFile', 'ptr', hmf, 'int')
-DeleteObject(hObject) => DllCall('Gdi32\DeleteObject', 'ptr', hObject, 'int')
 DescribePixelFormat(hdc, iPixelFormat, nBytes, ppfd) => DllCall('Gdi32\DescribePixelFormat', 'ptr', hdc, 'int', iPixelFormat, 'uint', nBytes, 'ptr', ppfd, 'int')
 DestroyPhysicalMonitorInternal(hMonitor) => DllCall('Gdi32\DestroyPhysicalMonitorInternal', 'ptr', hMonitor, 'int')
 DrawEscape(hdc, nEscape, cbInput, lpszInData) => DllCall('Gdi32\DrawEscape', 'ptr', hdc, 'int', nEscape, 'int', cbInput, 'astr', lpszInData, 'int')
@@ -275,7 +305,13 @@ SetPixelV(hdc, X, Y, crColor) => DllCall('Gdi32\SetPixelV', 'ptr', hdc, 'int', X
 SetPolyFillMode(hdc, iPolyFillMode) => DllCall('Gdi32\SetPolyFillMode', 'ptr', hdc, 'int', iPolyFillMode, 'int')
 SetROP2(hdc, fnDrawMode) => DllCall('Gdi32\SetROP2', 'ptr', hdc, 'int', fnDrawMode, 'int')
 SetRectRgn(hrgn, nLeftRect, nTopRect, nRightRect, nBottomRect) => DllCall('Gdi32\SetRectRgn', 'ptr', hrgn, 'int', nLeftRect, 'int', nTopRect, 'int', nRightRect, 'int', nBottomRect, 'int')
-SetStretchBltMode(hdc, iStretchMode) => DllCall('Gdi32\SetStretchBltMode', 'ptr', hdc, 'int', iStretchMode, 'int')
+SetStretchBltMode(hdc, iStretchMode := 4) {
+	; STRETCH_ANDSCANS 		= 0x01
+	; STRETCH_ORSCANS 		= 0x02
+	; STRETCH_DELETESCANS 	= 0x03
+	; STRETCH_HALFTONE 		= 0x04
+	return DllCall("gdi32\SetStretchBltMode", "Ptr", hdc, "int", iStretchMode)
+}
 SetSystemPaletteUse(hdc, uUsage) => DllCall('Gdi32\SetSystemPaletteUse', 'ptr', hdc, 'uint', uUsage, 'uint')
 SetTextAlign(hdc, fMode) => DllCall('Gdi32\SetTextAlign', 'ptr', hdc, 'uint', fMode, 'uint')
 SetTextCharacterExtra(hdc, nCharExtra) => DllCall('Gdi32\SetTextCharacterExtra', 'ptr', hdc, 'int', nCharExtra, 'int')
@@ -289,7 +325,10 @@ SetWindowOrgEx(hdc, X, Y, lpPoint) => DllCall('Gdi32\SetWindowOrgEx', 'ptr', hdc
 SetWorldTransform(hdc, lpXform) => DllCall('Gdi32\SetWorldTransform', 'ptr', hdc, 'ptr', lpXform, 'int')
 StartDoc(hdc, lpdi) => DllCall('Gdi32\StartDoc', 'ptr', hdc, 'ptr', lpdi, 'int')
 StartPage(hdc) => DllCall('Gdi32\StartPage', 'ptr', hdc, 'int')
-StretchBlt(hdcDest, nXOriginDest, nYOriginDest, nWidthDest, nHeightDest, hdcSrc, nXOriginSrc, nYOriginSrc, nWidthSrc, nHeightSrc, dwRop) => DllCall('Gdi32\StretchBlt', 'ptr', hdcDest, 'int', nXOriginDest, 'int', nYOriginDest, 'int', nWidthDest, 'int', nHeightDest, 'ptr', hdcSrc, 'int', nXOriginSrc, 'int', nYOriginSrc, 'int', nWidthSrc, 'int', nHeightSrc, 'uint', dwRop, 'int')
+StretchBlt(ddc, dx, dy, dw, dh, sdc, sx, sy, sw, sh, Raster := "") {
+	return DllCall("gdi32\StretchBlt", "Ptr", ddc, "int", dx, "int", dy, "int", dw, "int", dh
+		, "Ptr", sdc, "int", sx, "int", sy, "int", sw, "int", sh, "Uint", Raster ? Raster : 0x00CC0020)
+}
 StretchDIBits(hdc, XDest, YDest, nDestWidth, nDestHeight, XSrc, YSrc, nSrcWidth, nSrcHeight, lpBits, lpBitsInfo, iUsage, dwRop) => DllCall('Gdi32\StretchDIBits', 'ptr', hdc, 'int', XDest, 'int', YDest, 'int', nDestWidth, 'int', nDestHeight, 'int', XSrc, 'int', YSrc, 'int', nSrcWidth, 'int', nSrcHeight, 'ptr', lpBits, 'ptr', lpBitsInfo, 'uint', iUsage, 'uint', dwRop, 'int')
 StrokeAndFillPath(hdc) => DllCall('Gdi32\StrokeAndFillPath', 'ptr', hdc, 'int')
 StrokePath(hdc) => DllCall('Gdi32\StrokePath', 'ptr', hdc, 'int')

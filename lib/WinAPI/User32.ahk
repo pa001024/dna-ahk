@@ -186,8 +186,8 @@ GetComboBoxInfo(hwndCombo, pcbi) => DllCall('User32\GetComboBoxInfo', 'ptr', hwn
 GetCursor() => DllCall('User32\GetCursor', 'ptr')
 GetCursorInfo(pci) => DllCall('User32\GetCursorInfo', 'ptr', pci, 'int')
 GetCursorPos(lpPoint) => DllCall('User32\GetCursorPos', 'ptr', lpPoint, 'int')
-GetDC(hwnd) => DllCall('User32\GetDC', 'ptr', hwnd, 'ptr')
-GetDCEx(hWnd, hrgnClip, flags) => DllCall('User32\GetDCEx', 'ptr', hWnd, 'ptr', hrgnClip, 'uint', flags, 'ptr')
+GetDC(hwnd:=0) => DllCall('User32\GetDC', 'ptr', hwnd, 'ptr')
+GetDCEx(hWnd:=0, hrgnClip:=0, flags:=0) => DllCall('User32\GetDCEx', 'ptr', hWnd, 'ptr', hrgnClip, 'uint', flags, 'ptr')
 GetDesktopWindow() => DllCall('User32\GetDesktopWindow', 'ptr')
 GetDialogBaseUnits() => DllCall('User32\GetDialogBaseUnits', 'int')
 GetDlgCtrlID(hwndCtl) => DllCall('User32\GetDlgCtrlID', 'ptr', hwndCtl, 'int')
@@ -373,7 +373,7 @@ PostMessageW(hWnd, Msg, wParam, lParam) => DllCall('User32\PostMessageW', 'ptr',
 PostMessage_(hWnd, Msg, wParam, lParam) => DllCall('User32\PostMessage_', 'ptr', hWnd, 'uint', Msg, 'uptr', wParam, 'uptr', lParam, 'int')
 PostQuitMessage(nExitCode) => DllCall('User32\PostQuitMessage', 'int', nExitCode, 'int')
 PostThreadMessage(idThread, Msg, wParam, lParam) => DllCall('User32\PostThreadMessage', 'uint', idThread, 'uint', Msg, 'uptr', wParam, 'uptr', lParam, 'int')
-PrintWindow(hwnd, hdcBlt, nFlags) => DllCall('User32\PrintWindow', 'ptr', hwnd, 'ptr', hdcBlt, 'uint', nFlags, 'int')
+PrintWindow(hwnd, hdc, flags := 0) => DllCall("User32\PrintWindow", "Ptr", hwnd, "Ptr", hdc, "Uint", Flags)
 PrivateExtractIcons(lpszFile, nIconIndex, cxIcon, cyIcon, phicon, &piconid, nIcons, flags) => DllCall('User32\PrivateExtractIcons', 'str', lpszFile, 'int', nIconIndex, 'int', cxIcon, 'int', cyIcon, 'ptr', phicon, 'uint*', &piconid, 'uint', nIcons, 'uint', flags, 'uint')
 PtInRect(lprc, pt) => DllCall('User32\PtInRect', 'ptr', lprc, 'uint64', pt, 'int')
 RealChildWindowFromPoint(hwndParent, ptParentClientCoords) => DllCall('User32\RealChildWindowFromPoint', 'ptr', hwndParent, 'uint64', ptParentClientCoords, 'ptr')
@@ -390,7 +390,8 @@ RegisterShellHookWindow(hwnd) => DllCall('User32\RegisterShellHookWindow', 'ptr'
 RegisterTouchWindow(hWnd, ulFlags) => DllCall('User32\RegisterTouchWindow', 'ptr', hWnd, 'uint', ulFlags, 'int')
 RegisterWindowMessage(lpString) => DllCall('User32\RegisterWindowMessage', 'str', lpString, 'uint')
 ReleaseCapture() => DllCall('User32\ReleaseCapture', 'int')
-ReleaseDC(hWnd, hDC) => DllCall('User32\ReleaseDC', 'ptr', hWnd, 'ptr', hDC, 'int')
+ReleaseDC(hWnd, hDC:=0) => DllCall('User32\ReleaseDC', 'ptr', hWnd, 'ptr', hDC, 'int')
+DeleteDC(hdc) =>DllCall("DeleteDC", "Ptr", hdc)
 RemoveClipboardFormatListener(hwnd) => DllCall('User32\RemoveClipboardFormatListener', 'ptr', hwnd, 'int')
 RemoveMenu(hMenu, uPosition, uFlags) => DllCall('User32\RemoveMenu', 'ptr', hMenu, 'uint', uPosition, 'uint', uFlags, 'int')
 RemoveProp(hWnd, lpString) => DllCall('User32\RemoveProp', 'ptr', hWnd, 'str', lpString, 'ptr')
@@ -497,7 +498,16 @@ UnregisterDeviceNotification(Handle) => DllCall('User32\UnregisterDeviceNotifica
 UnregisterHotKey(hWnd, id) => DllCall('User32\UnregisterHotKey', 'ptr', hWnd, 'int', id, 'int')
 UnregisterPowerSettingNotification(Handle) => DllCall('User32\UnregisterPowerSettingNotification', 'ptr', Handle, 'int')
 UnregisterTouchWindow(hwnd) => DllCall('User32\UnregisterTouchWindow', 'ptr', hwnd, 'int')
-UpdateLayeredWindow(hwnd, hdcDst, pptDst, psize, hdcSrc, pptSrc, crKey, pblend, dwFlags) => DllCall('User32\UpdateLayeredWindow', 'ptr', hwnd, 'ptr', hdcDst, 'ptr', pptDst, 'ptr', psize, 'ptr', hdcSrc, 'ptr', pptSrc, 'uint', crKey, 'ptr', pblend, 'uint', dwFlags, 'int')
+UpdateLayeredWindow(hwnd, hdc, x := "", y := "", w := "", h := "", Alpha := 255) {
+	if (x != "" && y != "")
+		pt := Buffer(8), NumPut("UInt", Integer(x), "UInt", Integer(y), pt, 0)
+
+	if (w = "" || h = "")
+		WinGetPos(, , &w, &h, Integer(hwnd))
+
+	return DllCall("UpdateLayeredWindow", "Ptr", hwnd, "Ptr", 0, "Ptr", ((x = "") && (y = "")) ? 0 : pt
+		, "int64*", Integer(w) | Integer(h) << 32, "Ptr", hdc, "int64*", 0, "Uint", 0, "UInt*", Alpha << 16 | 1 << 24, "Uint", 2)
+}
 UpdateLayeredWindowIndirect(hwnd, &pULWInfo) => DllCall('User32\UpdateLayeredWindowIndirect', 'ptr', hwnd, 'uptr*', &pULWInfo, 'int')
 UpdateWindow(hwnd) => DllCall('User32\UpdateWindow', 'ptr', hwnd, 'int')
 UserHandleGrantAccess(hUserHandle, hJob, bGrant) => DllCall('User32\UserHandleGrantAccess', 'ptr', hUserHandle, 'ptr', hJob, 'int', bGrant, 'int')

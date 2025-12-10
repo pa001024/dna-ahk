@@ -211,8 +211,8 @@ class BitmapBuffer {
 		NumPut("ptr", bits, "uint", pitch, "uint", width, "uint", height, "uint", bytespixel, "uint", offsetx, "uint", offsety, this.info := Buffer(40, 0))
 		this.ptr := bits
 		this.pitch := pitch
-		this.width := width
-		this.height := height
+		this.width := Integer(width)
+		this.height := Integer(height)
 		this.size := pitch * height
 		this.bytespixel := bytespixel
 		this.offsetx := offsetx, this.offsety := offsety
@@ -606,5 +606,14 @@ class BitmapBuffer {
 		}
 		g.hbm := { ptr: DllCall("CreateDIBitmap", "ptr", hdc, "ptr", bm, "uint", 4, "ptr", this, "ptr", bm2, "int", 0, "ptr"), __Delete: (s) => DllCall("DeleteObject", "ptr", s) }
 		g.Show("NA")
+	}
+
+	; cvt2CV2Mat
+	cvtMat() {
+		bmp := this.cvtBytes(3)
+		mat := cv2.MAT()
+		val := (bmp.width * bmp.bytespixel + bmp.bytespixel) & -4  ; Channels := 3 ; 通道
+		img := cv2.MAT_Init().create(bmp.height, bmp.width, cv2.CV_8UC3, bmp.ptr, val)
+		return toMat(mat, img.clone())
 	}
 }

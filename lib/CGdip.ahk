@@ -7,6 +7,8 @@
  ***********************************************************************/
 
 #Requires AutoHotkey v2.0-beta
+#Include <WinAPI\User32>
+#Include <WinAPI\Gdi32>
 class CGdip
 {
 	static pToken := 0, hModule := 0, RefCount := 0
@@ -521,7 +523,7 @@ class CGdip
 			pBitmap := 0
 			if (hBitmap := DllCall("GetClipboardData", "Uint", 2, "Ptr"))
 				DllCall("gdiplus\GdipCreateBitmapFromHBITMAP", "Ptr", hBitmap, "Ptr", 0, "Ptr*", &pBitmap)
-				, DeleteObject(hBitmap)
+					, DeleteObject(hBitmap)
 			DllCall("CloseClipboard")
 			return CGdip.Bitmap(pBitmap)
 		}
@@ -833,7 +835,7 @@ class CGdip
 			DllCall("gdiplus\GdipDeleteFont", "Ptr", this)
 			if (!FontFamilys[this.font].Fonts.Count)
 				DllCall("gdiplus\GdipDeleteFontFamily", "Ptr", FontFamilys[this.font])
-				, FontFamilys.Delete(this.font)
+					, FontFamilys.Delete(this.font)
 		}
 	}
 
@@ -987,61 +989,6 @@ class CGdip
 	}
 }
 
-CreateCompatibleBitmap(hdc, w, h) {
-	return DllCall("gdi32\CreateCompatibleBitmap", "Ptr", hdc, "int", w, "int", h)
-}
-
-CreateDIBSection(w, h, hdc := "", bpp := 32, &ppvBits := 0) {
-	hdc2 := hdc ? hdc : GetDC()
-	bi := Buffer(40, 0)
-
-	NumPut("Uint", 40, "Uint", Integer(w), "Uint", Integer(h), "ushort", 1, "ushort", bpp, "uInt", 0, bi, 0)
-	hbm := DllCall("CreateDIBSection", "Ptr", hdc2, "Ptr", bi, "Uint", 0, "Ptr*", &ppvBits, "Ptr", 0, "Uint", 0, "Ptr")
-	if !hdc
-		ReleaseDC(hdc2)
-	return hbm
-}
-
-PrintWindow(hwnd, hdc, Flags := 0) {
-	return DllCall("PrintWindow", "Ptr", hwnd, "Ptr", hdc, "Uint", Flags)
-}
-
-PaintDesktop(hdc) {
-	return DllCall("PaintDesktop", "Ptr", hdc)
-}
-
-DestroyIcon(hIcon) {
-	return DllCall("DestroyIcon", "Ptr", hIcon)
-}
-
-CreateCompatibleDC(hdc := 0) {
-	return DllCall("CreateCompatibleDC", "Ptr", hdc, "ptr")
-}
-
-SelectObject(hdc, hgdiobj) {
-	return DllCall("SelectObject", "Ptr", hdc, "Ptr", hgdiobj, "ptr")
-}
-
-DeleteObject(hObject) {
-	return DllCall("DeleteObject", "Ptr", hObject)
-}
-
-GetDC(hwnd := 0) {
-	return DllCall("GetDC", "Ptr", hwnd, "ptr")
-}
-
-GetDCEx(hwnd, flags := 0, hrgnClip := 0) {
-	return DllCall("GetDCEx", "Ptr", hwnd, "Ptr", hrgnClip, "int", flags, "ptr")
-}
-
-ReleaseDC(hdc, hwnd := 0) {
-	return DllCall("ReleaseDC", "Ptr", hwnd, "Ptr", hdc)
-}
-
-DeleteDC(hdc) {
-	return DllCall("DeleteDC", "Ptr", hdc)
-}
-
 CreateRectF(&RectF, x, y, w, h) {
 	RectF := Buffer(16)
 	NumPut("float", x, "float", y, "float", w, "float", h, RectF, 0)
@@ -1078,52 +1025,6 @@ SetImage(hwnd, hBitmap) {
 	E := SendMessage(0x172, 0x0, hBitmap, , Integer(hwnd))
 	DeleteObject(E)
 	return E
-}
-
-SetStretchBltMode(hdc, iStretchMode := 4) {
-	; STRETCH_ANDSCANS 		= 0x01
-	; STRETCH_ORSCANS 		= 0x02
-	; STRETCH_DELETESCANS 	= 0x03
-	; STRETCH_HALFTONE 		= 0x04
-	return DllCall("gdi32\SetStretchBltMode", "Ptr", hdc, "int", iStretchMode)
-}
-
-StretchBlt(ddc, dx, dy, dw, dh, sdc, sx, sy, sw, sh, Raster := "") {
-	return DllCall("gdi32\StretchBlt", "Ptr", ddc, "int", dx, "int", dy, "int", dw, "int", dh
-		, "Ptr", sdc, "int", sx, "int", sy, "int", sw, "int", sh, "Uint", Raster ? Raster : 0x00CC0020)
-}
-
-BitBlt(ddc, dx, dy, dw, dh, sdc, sx, sy, Raster := "") {
-	; BLACKNESS				= 0x00000042
-	; NOTSRCERASE			= 0x001100A6
-	; NOTSRCCOPY			= 0x00330008
-	; SRCERASE				= 0x00440328
-	; DSTINVERT				= 0x00550009
-	; PATINVERT				= 0x005A0049
-	; SRCINVERT				= 0x00660046
-	; SRCAND				= 0x008800C6
-	; MERGEPAINT			= 0x00BB0226
-	; MERGECOPY				= 0x00C000CA
-	; SRCCOPY				= 0x00CC0020
-	; SRCPAINT				= 0x00EE0086
-	; PATCOPY				= 0x00F00021
-	; PATPAINT				= 0x00FB0A09
-	; WHITENESS				= 0x00FF0062
-	; CAPTUREBLT			= 0x40000000
-	; NOMIRRORBITMAP		= 0x80000000
-	return DllCall("gdi32\BitBlt", "Ptr", dDC, "int", dx, "int", dy, "int", dw, "int", dh
-		, "Ptr", sDC, "int", sx, "int", sy, "Uint", Raster ? Raster : 0x00CC0020)
-}
-
-UpdateLayeredWindow(hwnd, hdc, x := "", y := "", w := "", h := "", Alpha := 255) {
-	if (x != "" && y != "")
-		pt := Buffer(8), NumPut("UInt", Integer(x), "UInt", Integer(y), pt, 0)
-
-	if (w = "" || h = "")
-		WinGetPos(, , &w, &h, Integer(hwnd))
-
-	return DllCall("UpdateLayeredWindow", "Ptr", hwnd, "Ptr", 0, "Ptr", ((x = "") && (y = "")) ? 0 : pt
-			, "int64*", Integer(w) | Integer(h) << 32, "Ptr", hdc, "int64*", 0, "Uint", 0, "UInt*", Alpha << 16 | 1 << 24, "Uint", 2)
 }
 
 MDMF_FromPoint(X := "", Y := "") {

@@ -67,7 +67,7 @@ Insert::=
 }
 
 
-CapsLock & r:: Reload()
+CapsLock & r:: PreReload()
 ; CapsLock & e:: initHttpClient()
 ; 静音当前程序
 CapsLock & Volume_Mute:: {
@@ -82,7 +82,32 @@ CapsLock & c:: {
     CoordMode "Mouse", "Client"
     MouseGetPos &x, &y
     pixelColor := SubStr(PixelGetColor(x, y), -6)
-    A_Clipboard := x . ", " . y . ", `"" . pixelColor . "`""
+    if GetKeyState("Shift", "P")
+        A_Clipboard := "mc " x ", " y ", `"" pixelColor "`""
+    else
+        A_Clipboard := "mc " x ", " y
+}
+; 取框 x1,y1,x2,y2
+CapsLock & t:: {
+    CoordMode "Mouse", "Client"
+    MouseGetPos &x1, &y1
+    loop
+    {
+        ToolTip("请按下鼠标左键")
+        sleep(50)
+        if (GetKeyState("Esc"))
+        {
+            ToolTip
+            return false
+        }
+    } until (GetKeyState("LButton"))
+    MouseGetPos &x2, &y2
+    ToolTip
+    A_Clipboard := "readText(" x1 ", " y1 ", " x2 ", " y2 ")"
+}
+; 启动FindText
+CapsLock & f:: {
+    FindText().Gui("Show")
 }
 ; 鼠标连点
 CapsLock & x:: {
