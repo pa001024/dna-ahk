@@ -10,9 +10,10 @@ SetCapsLockState 0
 SetWinDelay 20
 CoordMode "Mouse", "Client"
 
-#Include basic.ahk
-#Include short.ahk
-#Include gui.ahk
+#Include lib.ahk
+#Include Hotkey\basic.ahk
+#Include Hotkey\short.ahk
+#Include Gui\gui.ahk
 #Include <MouseHook>
 
 
@@ -508,9 +509,9 @@ mode_65mod() {
             restart
             wc(51, 30, "FFFFFF")
             s 3000
-            msgl "开始跑图"
+            msg "开始跑图"
             runMap65
-            msgl "完成跑图"
+            msg "完成跑图"
             battle
         }
     }

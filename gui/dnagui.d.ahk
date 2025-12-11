@@ -14,4 +14,6 @@ class DNAGui {
     Mute() => void
     Reload() => void
     static visible() => Boolean
+    static Close() => Boolean
+    static Show() => Boolean
 }

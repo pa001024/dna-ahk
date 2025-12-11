@@ -1,5 +1,4 @@
 #Requires AutoHotkey v2.0
-#Include lib.ahk
 
 ; Alt+中键移动窗口
 !MButton:: {

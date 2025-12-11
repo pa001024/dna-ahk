@@ -1,5 +1,4 @@
 #Requires AutoHotkey v2.0
-#Include lib.ahk
 
 kb(k) => (ControlSend(k, hwnd), 0)
 xy(x, y) => (mouseXY(x, y), 0)
