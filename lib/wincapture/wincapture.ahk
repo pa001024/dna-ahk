@@ -610,6 +610,9 @@ class BitmapBuffer {
 
 	; cvt2CV2Mat
 	cvtMat() {
+		if (!IsSet(toMat)) {
+			return
+		}
 		bmp := this.cvtBytes(3)
 		mat := cv2.MAT()
 		val := (bmp.width * bmp.bytespixel + bmp.bytespixel) & -4  ; Channels := 3 ; 通道

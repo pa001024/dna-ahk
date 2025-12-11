@@ -1,12 +1,8 @@
 #Requires AutoHotkey v2.0
 #Include lib.ahk
 
-; 按键映射
-Insert::=
-
 ; Alt+中键移动窗口
-!MButton::
-{
+!MButton:: {
     CoordMode "Mouse", "Screen"
     MouseGetPos &oriX, &oriY, &hwnd
     WinGetPos &winX, &winY, &winW, &winH, hwnd
@@ -26,8 +22,7 @@ Insert::=
     CoordMode "Mouse", "Client"
 }
 ; Alt+右键缩放窗口
-!RButton::
-{
+!RButton:: {
     CoordMode "Mouse", "Screen"
     MouseGetPos &oriX, &oriY, &hwnd
     WinGetPos &winX, &winY, &winW, &winH, hwnd
@@ -67,7 +62,7 @@ Insert::=
 }
 
 
-CapsLock & r:: PreReload()
+CapsLock & r:: Reload()
 ; CapsLock & e:: initHttpClient()
 ; 静音当前程序
 CapsLock & Volume_Mute:: {
@@ -88,26 +83,18 @@ CapsLock & c:: {
         A_Clipboard := "mc " x ", " y
 }
 ; 取框 x1,y1,x2,y2
-CapsLock & t:: {
-    CoordMode "Mouse", "Client"
-    MouseGetPos &x1, &y1
-    loop
-    {
-        ToolTip("请按下鼠标左键")
-        sleep(50)
-        if (GetKeyState("Esc"))
-        {
-            ToolTip
-            return false
-        }
-    } until (GetKeyState("LButton"))
-    MouseGetPos &x2, &y2
-    ToolTip
+CapsLock & t:: copyRangeText()
+copyRangeText() {
+    GetRange(&x, &y, &w, &h)
+    ; 转换为客户区坐标
+    WinGetClientPos &cx, &cy, , , hwnd
+    x := x - cx, y := y - cy
+    x1 := x, y1 := y, x2 := x + w, y2 := y + h
     A_Clipboard := "readText(" x1 ", " y1 ", " x2 ", " y2 ")"
 }
 ; 启动FindText
 CapsLock & f:: {
-    FindText().Gui("Show")
+    FindText().gui("Show")
 }
 ; 鼠标连点
 CapsLock & x:: {

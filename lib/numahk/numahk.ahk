@@ -26,8 +26,8 @@ IN_DIMS_INTERVAL := ","
 NUMAHK_DEFPROP := {}.defineprop
 NUMAHK_DELPROP := {}.deleteprop
 MAX_NDARRAY_PRINT := 20000
-NUMAHK_DEFPROP(numahk.ndarray([]).base, "T", {get: NUMAHK_T})
-NUMAHK_DEFPROP(numahk.ndarray([]).base, "flat", {get: NUMAHK_FLATGET, set: (this, value) => NUMAHK_FLATSET(this, value)})
+NUMAHK_DEFPROP(numahk.ndarray([]).base, "T", { get: NUMAHK_T })
+NUMAHK_DEFPROP(numahk.ndarray([]).base, "flat", { get: NUMAHK_FLATGET, set: (this, value) => NUMAHK_FLATSET(this, value) })
 
 NUMAHK_T(this)
 {
@@ -61,9 +61,9 @@ NUMAHK_FLATSET(this, value)
 class numahk extends numahk_const
 {
     static cv2_map := map("int8", "CV_8SC", "uint8", "CV_8UC", "int16", "CV_16SC", "uint16", "CV_16UC", "int32", "CV_32SC", "uint32", "CV_32UC", "float32", "CV_32FC", "float64", "CV_64FC")
-    
+
     static type_dict := map("int8", 1, "uint8", 1, "int16", 2, "uint16", 2, "int32", 4, "uint32", 4, "int64", 8, "uint64", 8, "float32", 4, "float64", 8, "bool_", 1)
-    
+
     class ndarray
     {
         __new(_array, dtype := numahk.float64, isflat := false, is_c := false, length_c := 0)
@@ -110,13 +110,13 @@ class numahk extends numahk_const
                 this.pos_strides := c_array.array_strides(this.shape, 1)
             }
         }
-        
+
         __item[pos*]
         {
             get => this.get_single_element(pos*)
             set => this.set_single_element(value, pos*)
         }
-        
+
         get_single_element(pos*)
         {
             if pos.length = 1 && pos[1] is array
@@ -129,7 +129,7 @@ class numahk extends numahk_const
             ret_ptr := dllcall("Numahk\NDArray_Get", "ptr", this.data, "ptr", numget(objptr(tmp), 0x20, "ptr"), "ptr", numget(objptr(tmp2), 0x20, "ptr"), "int", tmp.length, "int", dtype, "int", AHK_FLAG)
             return numget(ret_ptr, 0, numahk.ahktype(dtype))
         }
-        
+
         set_single_element(value, pos*)
         {
             if pos.length = 1 && pos[1] is array
@@ -142,7 +142,7 @@ class numahk extends numahk_const
             dtype := numahk.%dtype%
             dllcall("Numahk\NDArray_Set", "ptr", this.data, "ptr", numget(objptr(tmp), 0x20, "ptr"), "ptr", numget(objptr(tmp2), 0x20, "ptr"), "ptr", numget(objptr(tmp3), 0x20, "ptr"), "int", tmp.length, "int", dtype, "int", AHK_FLAG)
         }
-        
+
         __delete()
         {
             dtype := this.dtype
@@ -150,47 +150,47 @@ class numahk extends numahk_const
             if FREE_FLAG && this.data != 0
                 dllcall("Numahk\NDArray_Free", "ptr", this.data, "int", dtype)
         }
-        
+
         add(ndarray)
         {
             return numahk.add(this, ndarray)
         }
-        
+
         all(axis := "")
         {
             return numahk.all(this, axis)
         }
-        
+
         any(axis := "")
         {
             return numahk.any(this, axis)
         }
-        
+
         argmax(axis := "")
         {
             return numahk.argmax(this, axis)
         }
-        
+
         argmin(axis := "")
         {
             return numahk.argmin(this, axis)
         }
-        
+
         argpartition(kth, axis := -1)
         {
             return numahk.argpartition(this, kth, axis)
         }
-        
+
         astype(dtype)
         {
             return numahk.astype(this, dtype)
         }
-        
+
         choose(choices)
         {
             return numahk.choose(this, choices)
         }
-        
+
         clone()
         {
             dtype := this.dtype
@@ -201,147 +201,147 @@ class numahk extends numahk_const
             new_ndarray.pos_strides := this.pos_strides
             return new_ndarray
         }
-        
+
         clip(ndarray_min, ndarray_max)
         {
             return numahk.clip(this, ndarray_min, ndarray_max)
         }
-        
+
         compress(condition, axis := "")
         {
             return numahk.compress(condition, this, axis)
         }
-        
+
         copy()
         {
             return this.clone()
         }
-        
+
         cumprod(axis := "")
         {
             return numahk.cumprod(this, axis)
         }
-        
+
         cumsum(axis := "")
         {
             return numahk.cumsum(this, axis)
         }
-        
+
         diag(offset := 0)
         {
             return numahk.diag(this, offset)
         }
-        
+
         diagonal(offset := 0, axis1 := AHK_FLAG, axis2 := AHK_FLAG + 1)
         {
             return numahk.diagonal(this, offset, axis1, axis2)
         }
-        
+
         div(ndarray)
         {
             return numahk.divide(this, ndarray)
         }
-        
+
         dot(ndarray)
         {
             return numahk.dot(this, ndarray)
         }
-        
+
         dump(filename)
         {
             numahk.dump(this, filename)
         }
-        
+
         fill(value)
         {
             return numahk.fill(this, value)
         }
-        
+
         flatten()
         {
             return this.flat
         }
-        
+
         max(axis := "")
         {
             return numahk.max(this, axis)
         }
-        
+
         mean(axis := "")
         {
             return numahk.mean(this, axis)
         }
-        
+
         min(axis := "")
         {
             return numahk.min(this, axis)
         }
-        
+
         mul(ndarray)
         {
             return numahk.multiply(this, ndarray)
         }
-        
+
         partition(kth, axis := -1)
         {
             return numahk.partition(this, kth, axis)
         }
-        
+
         prod(axis := "")
         {
             return numahk.prod(this, axis)
         }
-        
+
         ptp(axis := "")
         {
             return numahk.ptp(this, axis)
         }
-        
+
         put(index, value)
         {
             return numahk.put(this, index, value)
         }
-        
+
         ravel()
         {
             return numahk.ravel(this)
         }
-        
+
         reshape(shape*)
         {
-           return numahk.reshape(this, shape*)
+            return numahk.reshape(this, shape*)
         }
-        
+
         resize(shape*)
         {
-           return numahk.reshape(this, shape*)
+            return numahk.reshape(this, shape*)
         }
-        
+
         squeeze(axis := "")
         {
             return numahk.squeeze(this, axis)
         }
-        
+
         std(axis := "")
         {
             return numahk.std(this, axis)
         }
-        
+
         sub(ndarray)
         {
             return numahk.subtract(this, ndarray)
         }
-        
+
         sum(axis := "")
         {
             return numahk.sum(this, axis)
         }
-        
+
         swapaxes(axis1, axis2)
         {
             return numahk.swapaxes(this, axis1, axis2)
         }
-        
+
         tolist()
         {
             if fileexist("NUMAHK_NDArray_Print.tmp")
@@ -352,13 +352,13 @@ class numahk extends numahk_const
             dllcall("Numahk\NDArray_Print", "ptr", this.data, "ptr", numget(objptr(this.shape), 0x20, "ptr"), "int", this.ndim, "int", this.pos_strides[-1], "int", this.size, "int", dtype, "astr", ",", "astr", ",")
             return Json_Parser("NUMAHK_NDArray_Print.tmp")
         }
-        
+
         tojson()
         {
-            _json := {shape: this.shape, strides: this.strides, pos_strides: this.pos_strides, size: this.size, nbytes: this.nbytes, dtype: this.dtype, itemsize: this.itemsize, ndim: this.ndim}
+            _json := { shape: this.shape, strides: this.strides, pos_strides: this.pos_strides, size: this.size, nbytes: this.nbytes, dtype: this.dtype, itemsize: this.itemsize, ndim: this.ndim }
             return Json_Generator(_json)
         }
-        
+
         tomat()
         {
             if this.shape.length > 3
@@ -375,7 +375,7 @@ class numahk extends numahk_const
                 return mat
             }
         }
-        
+
         tostring()
         {
             if this.data = 0
@@ -394,18 +394,18 @@ class numahk extends numahk_const
             dllcall("Numahk\NDArray_Print", "ptr", this.data, "ptr", numget(objptr(this.shape), 0x20, "ptr"), "int", this.ndim, "int", this.pos_strides[-1], "int", this.size, "int", dtype, "astr", DIMS_INTERVAL, "astr", IN_DIMS_INTERVAL)
             return "`ntype: numahk.ndarray`n" fileread("NUMAHK_NDArray_Print.tmp") "`ndtype: " this.dtype
         }
-        
+
         transpose(axes := "")
         {
             return numahk.transpose(this, axes)
         }
-        
+
         var(axis := "")
         {
             return numahk.var(this, axis)
         }
     }
-    
+
     class random
     {
         static choice(ndarray, shape*)
@@ -424,7 +424,7 @@ class numahk extends numahk_const
             new_data := dllcall("Numahk\Random_Choice", "ptr", ndarray.data, "int", ndarray.size, "int", new_size, "int", dtype)
             return numahk.ndarray(new_data, dtype, , true, new_size).resize(shape)
         }
-        
+
         static normal(loc := 0.0, scale := 1.0, shape*)
         {
             if shape.length = 1 && shape[1] is array
@@ -435,7 +435,7 @@ class numahk extends numahk_const
             new_data := dllcall("Numahk\Random_Normal", "double", loc, "double", scale, "int", new_size)
             return numahk.ndarray(new_data, numahk.float64, , true, new_size).resize(shape)
         }
-        
+
         static rand(shape*)
         {
             if shape.length = 1 && shape[1] is array
@@ -446,7 +446,7 @@ class numahk extends numahk_const
             new_data := dllcall("Numahk\Random_Rand", "int", new_size)
             return numahk.ndarray(new_data, numahk.float64, , true, new_size).resize(shape)
         }
-        
+
         static randint(start, end, shape*)
         {
             end := end - (1 - AHK_FLAG)
@@ -458,7 +458,7 @@ class numahk extends numahk_const
             new_data := dllcall("Numahk\Random_Randint", "int", start, "int", end, "int", new_size)
             return numahk.ndarray(new_data, numahk.int32, , true, new_size).resize(shape)
         }
-        
+
         static randn(shape*)
         {
             if shape.length = 1 && shape[1] is array
@@ -469,13 +469,13 @@ class numahk extends numahk_const
             new_data := dllcall("Numahk\Random_Randn", "int", new_size)
             return numahk.ndarray(new_data, numahk.float64, , true, new_size).resize(shape)
         }
-        
+
         static seed(seed)
         {
             dllcall("Numahk\Random_Seed", "double", seed)
         }
     }
-    
+
     static add(ndarray1, ndarray2)
     {
         if (ndarray1 is number) && (ndarray2 is number)
@@ -536,7 +536,7 @@ class numahk extends numahk_const
         new_data := dllcall("Numahk\NDArray_Add", "ptr", ndarray1_data, "ptr", ndarray2_data, "int", ndarray1_dtype, "int", ndarray2_dtype, "int", length, "int", new_dtype)
         return numahk.ndarray(new_data, new_dtype, , true, length).resize(shape)
     }
-    
+
     static any(ndarray, axis := "")
     {
         if !(ndarray is numahk.ndarray)
@@ -558,7 +558,7 @@ class numahk extends numahk_const
         length_c := c_array.array_product(shape)
         return numahk.ndarray(new_data, numahk.bool_, , true, length_c).resize(shape)
     }
-    
+
     static all(ndarray, axis := "")
     {
         if !(ndarray is numahk.ndarray)
@@ -580,7 +580,7 @@ class numahk extends numahk_const
         length_c := c_array.array_product(shape)
         return numahk.ndarray(new_data, numahk.bool_, , true, length_c).resize(shape)
     }
-    
+
     static arange(start := "", stop := "", step := "", dtype := numahk.float64)
     {
         if start = ""
@@ -597,7 +597,7 @@ class numahk extends numahk_const
         length_c := floor((stop - start) / step)
         return numahk.ndarray(data, dtype, , true, length_c)
     }
-    
+
     static argmax(ndarray, axis := "")
     {
         if !(ndarray is numahk.ndarray)
@@ -619,7 +619,7 @@ class numahk extends numahk_const
         length_c := c_array.array_product(shape)
         return numahk.ndarray(new_data, numahk.int64, , true, length_c).resize(shape)
     }
-    
+
     static argmin(ndarray, axis := "")
     {
         if !(ndarray is numahk.ndarray)
@@ -641,7 +641,7 @@ class numahk extends numahk_const
         length_c := c_array.array_product(shape)
         return numahk.ndarray(new_data, numahk.int64, , true, length_c).resize(shape)
     }
-    
+
     static argpartition(ndarray, kth, axis := -1)
     {
         if !(ndarray is numahk.ndarray)
@@ -661,7 +661,7 @@ class numahk extends numahk_const
         new_data := dllcall("Numahk\NDArray_Argpartition", "ptr", ndarray.data, "ptr", numget(objptr(shape), 0x20, "ptr"), "int", shape.length, "int", ndarray.pos_strides[axis + 1], "int", kth, "int", axis, "int", dtype)
         return numahk.ndarray(new_data, numahk.int64, , true, ndarray.size).resize(shape)
     }
-    
+
     static argsort(ndarray, axis := -1)
     {
         if !(ndarray is numahk.ndarray)
@@ -679,12 +679,12 @@ class numahk extends numahk_const
         new_data := dllcall("Numahk\NDArray_Argpartition", "ptr", ndarray.data, "ptr", numget(objptr(shape), 0x20, "ptr"), "int", shape.length, "int", ndarray.pos_strides[axis + 1], "int", kth, "int", axis, "int", dtype)
         return numahk.ndarray(new_data, numahk.int64, , true, ndarray.size).resize(shape)
     }
-    
+
     static array(_array, dtype := numahk.float64, isflat := false, is_c := false, length_c := 0)
     {
         return numahk.ndarray(_array, dtype, isflat, is_c, length_c)
     }
-    
+
     static astype(ndarray, dtype)
     {
         if !(ndarray is numahk.ndarray)
@@ -697,7 +697,7 @@ class numahk extends numahk_const
         new_ndarray.pos_strides := ndarray.pos_strides
         return new_ndarray
     }
-    
+
     static axis_dev(ndim, axis, pass := false)
     {
         if axis < 0
@@ -708,7 +708,7 @@ class numahk extends numahk_const
             throw error(format("numahk.AxisError: axis {} is out of bounds for array of dimension {}", axis, ndim))
         return new_axis
     }
-    
+
     static broadcast(ndarray1, ndarray2)
     {
         new_shape := (ndarray1.ndim > ndarray2.ndim) ? ndarray1.shape.clone() : ndarray2.shape.clone()
@@ -744,7 +744,7 @@ class numahk extends numahk_const
         ndarray2.strides := c_array.array_strides(ndarray2.shape, ndarray2.dtype)
         ndarray2.pos_strides := c_array.array_strides(ndarray2.shape, 1)
     }
-    
+
     static choose(ndarray, choices)
     {
         if !(ndarray is numahk.ndarray)
@@ -774,7 +774,7 @@ class numahk extends numahk_const
         new_data := dllcall("Numahk\NDArray_Choose", "ptr", ndarray.data, "ptr", numget(objptr(choices), 0x20, "ptr"), "int", ndarray.size, "int", dtype, "int", AHK_FLAG)
         return numahk.ndarray(new_data, numahk.int32, , true, ndarray.size).resize(ndarray.shape)
     }
-    
+
     static clip(ndarray, ndarray_min, ndarray_max)
     {
         if !(ndarray is numahk.ndarray)
@@ -785,7 +785,7 @@ class numahk extends numahk_const
         new_data := dllcall("Numahk\NDArray_Clip", "ptr", ndarray.data, "double", ndarray_min, "double", ndarray_max, "int", ndarray.size, "int", dtype)
         return numahk.ndarray(new_data, dtype, , true, ndarray.size).resize(ndarray.shape)
     }
-    
+
     static compress(condition, ndarray, axis := "")
     {
         if !(ndarray is numahk.ndarray)
@@ -836,7 +836,7 @@ class numahk extends numahk_const
         new_data := dllcall("Numahk\NDArray_Compress", "ptr", ndarray.data, "ptr", new_data, "int", length_c, "int", ndarray.size, "int", dtype)
         return numahk.ndarray(new_data, dtype, , true, length_c).resize(new_shape)
     }
-    
+
     static cumprod(ndarray, axis := "")
     {
         if !(ndarray is numahk.ndarray)
@@ -856,7 +856,7 @@ class numahk extends numahk_const
         new_data := dllcall("Numahk\NDArray_Cumprod", "ptr", ndarray.data, "ptr", numget(objptr(shape), 0x20, "ptr"), "int", shape.length, "int", ndarray.pos_strides[axis + 1], "int", axis, "int", dtype)
         return numahk.ndarray(new_data, dtype, , true, ndarray.size).resize(shape)
     }
-    
+
     static cumsum(ndarray, axis := "")
     {
         if !(ndarray is numahk.ndarray)
@@ -876,7 +876,7 @@ class numahk extends numahk_const
         new_data := dllcall("Numahk\NDArray_Cumsum", "ptr", ndarray.data, "ptr", numget(objptr(shape), 0x20, "ptr"), "int", shape.length, "int", ndarray.pos_strides[axis + 1], "int", axis, "int", dtype)
         return numahk.ndarray(new_data, dtype, , true, ndarray.size).resize(shape)
     }
-    
+
     static diag(ndarray, offset := 0)
     {
         if !(ndarray is numahk.ndarray)
@@ -892,7 +892,7 @@ class numahk extends numahk_const
         new_data := dllcall("Numahk\NDArray_Diag", "ptr", ndarray.data, "int", ndarray.size, "int", length, "int", _offset, "int", dtype)
         return numahk.ndarray(new_data, dtype, , true, length * length).resize([length, length])
     }
-    
+
     static diagonal(ndarray, offset := 0, axis1 := AHK_FLAG, axis2 := AHK_FLAG + 1)
     {
         if !(ndarray is numahk.ndarray)
@@ -931,7 +931,7 @@ class numahk extends numahk_const
         shape.push(axis_length)
         return numahk.ndarray(new_data, dtype, , true, length).resize(shape)
     }
-    
+
     static divide(ndarray1, ndarray2)
     {
         if ndarray2 is number && ndarray2 = 0
@@ -996,7 +996,7 @@ class numahk extends numahk_const
         new_data := dllcall("Numahk\NDArray_Divide", "ptr", ndarray1_data, "ptr", ndarray2_data, "int", ndarray1_dtype, "int", ndarray2_dtype, "int", length, "int", new_dtype)
         return numahk.ndarray(new_data, new_dtype, , true, length).resize(shape)
     }
-    
+
     static dot(ndarray1, ndarray2)
     {
         total_flag := 0
@@ -1036,7 +1036,7 @@ class numahk extends numahk_const
         new_data := dllcall("Numahk\NDArray_Dot", "ptr", ndarray1.data, "ptr", ndarray2.data, "ptr", numget(objptr(shape1), 0x20, "ptr"), "ptr", numget(objptr(shape2), 0x20, "ptr"), "ptr", numget(objptr(strides1), 0x20, "ptr"), "ptr", numget(objptr(strides2), 0x20, "ptr"), "int", shape1.length, "int", shape2.length, "int", jump_step1, "int", jump_step2, "int", arr_length, "int", ndarray1_dtype, "int", ndarray2_dtype, "int", dtype)
         return numahk.ndarray(new_data, dtype, , true, c_array.array_product(new_shape)).resize(new_shape)
     }
-    
+
     static dtype_dev(dtype1, dtype2)
     {
         if dtype1 = dtype2
@@ -1059,7 +1059,7 @@ class numahk extends numahk_const
             return _dtype1
         return (_dtype2 < numahk.int32) ? _dtype1 : numahk.float64
     }
-    
+
     static dump(ndarray, filename)
     {
         filename := strreplace(filename, ".pk")
@@ -1075,7 +1075,7 @@ class numahk extends numahk_const
         dtype := numahk.%dtype%
         dllcall("Numahk\NDArray_Dump", "ptr", ndarray.data, "int", ndarray.size, "int", dtype, "astr", filename ".pk")
     }
-    
+
     static fill(ndarray, value)
     {
         if !(ndarray is numahk.ndarray)
@@ -1083,20 +1083,20 @@ class numahk extends numahk_const
         ndarray.flat := value
         return ndarray
     }
-    
+
     static full(shape, value, dtype := numahk.float64)
     {
         return numahk.nums(value, shape, dtype)
     }
-    
+
     static full_like(ndarray, value, dtype := ndarray.dtype)
     {
         return numahk.nums_like(value, ndarray, dtype)
     }
-    
+
     static load(filename)
     {
-        filename := fileexist(filename) ? filename : fileexist(filename ".pk") ? filename ".pk" : fileexist(filename ".naz") ? filename ".naz" :  fileexist(filename ".nax") ? filename ".nax" : [filename]
+        filename := fileexist(filename) ? filename : fileexist(filename ".pk") ? filename ".pk" : fileexist(filename ".naz") ? filename ".naz" : fileexist(filename ".nax") ? filename ".nax" : [filename]
         if filename is array
             throw error(format("FileNotFoundError: [Errno 2] No such file or directory: {}", filename[1]))
         if instr(filename, ".pk")
@@ -1111,7 +1111,7 @@ class numahk extends numahk_const
             return ndarray
         }
     }
-    
+
     static max(ndarray, axis := "")
     {
         if !(ndarray is numahk.ndarray)
@@ -1133,7 +1133,7 @@ class numahk extends numahk_const
         length_c := c_array.array_product(shape)
         return numahk.ndarray(new_data, dtype, , true, length_c).resize(shape)
     }
-    
+
     static mean(ndarray, axis := "")
     {
         if !(ndarray is numahk.ndarray)
@@ -1155,7 +1155,7 @@ class numahk extends numahk_const
         length_c := c_array.array_product(shape)
         return numahk.ndarray(new_data, dtype, , true, length_c).resize(shape)
     }
-    
+
     static min(ndarray, axis := "")
     {
         if !(ndarray is numahk.ndarray)
@@ -1177,7 +1177,7 @@ class numahk extends numahk_const
         length_c := c_array.array_product(shape)
         return numahk.ndarray(new_data, dtype, , true, length_c).resize(shape)
     }
-    
+
     static multiply(ndarray1, ndarray2)
     {
         if (ndarray1 is number) && (ndarray2 is number)
@@ -1238,7 +1238,7 @@ class numahk extends numahk_const
         new_data := dllcall("Numahk\NDArray_Multiply", "ptr", ndarray1_data, "ptr", ndarray2_data, "int", ndarray1_dtype, "int", ndarray2_dtype, "int", length, "int", new_dtype)
         return numahk.ndarray(new_data, new_dtype, , true, length).resize(shape)
     }
-    
+
     static nums(number, shape, dtype := numahk.float64)
     {
         shape := shape is array ? shape : [shape]
@@ -1246,7 +1246,7 @@ class numahk extends numahk_const
         new_data := dllcall("Numahk\NUMAHK_NUMS", "int", number, "int", length_c, "int", dtype)
         return numahk.ndarray(new_data, dtype, , true, length_c).resize(shape)
     }
-    
+
     static nums_like(number, ndarray, dtype := ndarray.dtype)
     {
         if !(ndarray is numahk.ndarray)
@@ -1256,17 +1256,17 @@ class numahk extends numahk_const
         shape := ndarray.shape
         return numahk.nums(number, shape, dtype)
     }
-    
+
     static ones(shape, dtype := numahk.float64)
     {
         return numahk.nums(1, shape, dtype)
     }
-    
+
     static ones_like(ndarray, dtype := ndarray.dtype)
     {
         return numahk.nums_like(1, ndarray, dtype)
     }
-    
+
     static partition(ndarray, kth, axis := -1)
     {
         if !(ndarray is numahk.ndarray)
@@ -1286,7 +1286,7 @@ class numahk extends numahk_const
         new_data := dllcall("Numahk\NDArray_Partition", "ptr", ndarray.data, "ptr", numget(objptr(shape), 0x20, "ptr"), "int", shape.length, "int", ndarray.pos_strides[axis + 1], "int", kth, "int", axis, "int", dtype)
         return numahk.ndarray(new_data, dtype, , true, ndarray.size).resize(shape)
     }
-    
+
     static prod(ndarray, axis := "")
     {
         if !(ndarray is numahk.ndarray)
@@ -1308,14 +1308,14 @@ class numahk extends numahk_const
         length_c := c_array.array_product(shape)
         return numahk.ndarray(new_data, dtype, , true, length_c).resize(shape)
     }
-    
+
     static ptp(ndarray, axis := "")
     {
         if !(ndarray is numahk.ndarray)
             ndarray := numahk.ndarray(ndarray)
         return numahk.subtract(ndarray.max(axis), ndarray.min(axis))
     }
-    
+
     static put(ndarray, index, value)
     {
         if !(ndarray is numahk.ndarray)
@@ -1332,17 +1332,17 @@ class numahk extends numahk_const
         numput(numahk.ahktype(numahk.%dtype%), value, ndarray.data, (index - AHK_FLAG) * numahk.type_dict[dtype])
         return ndarray
     }
-    
+
     static ravel(ndarray)
     {
         return ndarray.flat
     }
-    
+
     static repeat(ndarray, repeats, axis := "")
     {
-        
+
     }
-    
+
     static reshape(ndarray, shape*)
     {
         _flag := 0
@@ -1372,12 +1372,12 @@ class numahk extends numahk_const
         new_ndarray.pos_strides := c_array.array_strides(shape, 1)
         return new_ndarray
     }
-    
+
     static resize(ndarray, shape*)
     {
         return numahk.reshape(ndarray, shape*)
     }
-    
+
     static searchsorted(ndarray, value, side := "left")
     {
         if !(ndarray is numahk.ndarray)
@@ -1388,7 +1388,7 @@ class numahk extends numahk_const
         dtype := numahk.%dtype%
         return dllcall("Numahk\NDArray_Searchsorted", "ptr", new_ndarray.data, "double", value, "int", side, "int", new_ndarray.size, "int", dtype)
     }
-    
+
     static sort(ndarray, axis := -1)
     {
         if !(ndarray is numahk.ndarray)
@@ -1406,7 +1406,7 @@ class numahk extends numahk_const
         new_data := dllcall("Numahk\NDArray_Partition", "ptr", ndarray.data, "ptr", numget(objptr(shape), 0x20, "ptr"), "int", shape.length, "int", ndarray.pos_strides[axis + 1], "int", kth, "int", axis, "int", dtype)
         return numahk.ndarray(new_data, dtype, , true, ndarray.size).resize(shape)
     }
-    
+
     static squeeze(ndarray, axis := "")
     {
         if !(ndarray is numahk.ndarray)
@@ -1443,7 +1443,7 @@ class numahk extends numahk_const
         ndarray.pos_strides := c_array.array_strides(ndarray.shape, 1)
         return ndarray
     }
-    
+
     static std(ndarray, axis := "", ddof := 0)
     {
         if !(ndarray is numahk.ndarray)
@@ -1463,7 +1463,7 @@ class numahk extends numahk_const
         length_c := c_array.array_product(shape)
         return numahk.ndarray(new_data, numahk.float64, , true, length_c).resize(shape)
     }
-    
+
     static subtract(ndarray1, ndarray2)
     {
         if (ndarray1 is number) && (ndarray2 is number)
@@ -1524,7 +1524,7 @@ class numahk extends numahk_const
         new_data := dllcall("Numahk\NDArray_Subtract", "ptr", ndarray1_data, "ptr", ndarray2_data, "int", ndarray1_dtype, "int", ndarray2_dtype, "int", length, "int", new_dtype)
         return numahk.ndarray(new_data, new_dtype, , true, length).resize(shape)
     }
-    
+
     static sum(ndarray, axis := "")
     {
         if !(ndarray is numahk.ndarray)
@@ -1546,7 +1546,7 @@ class numahk extends numahk_const
         length_c := c_array.array_product(shape)
         return numahk.ndarray(new_data, dtype, , true, length_c).resize(shape)
     }
-    
+
     static swapaxes(ndarray, axis1, axis2)
     {
         if !(ndarray is numahk.ndarray)
@@ -1561,7 +1561,7 @@ class numahk extends numahk_const
         axes[axis2 + 1] := tmp
         return numahk.transpose(ndarray, axes)
     }
-    
+
     static transpose(ndarray, axes := "")
     {
         if !(ndarray is numahk.ndarray)
@@ -1594,7 +1594,7 @@ class numahk extends numahk_const
         new_data := dllcall("Numahk\NDArray_Transpose", "ptr", ndarray.data, "ptr", numget(objptr(shape), 0x20, "ptr"), "int", shape.length, "int", new_strides[-1], "int", dtype)
         return numahk.ndarray(new_data, dtype, , true, ndarray.size).resize(new_shape)
     }
-    
+
     static var(ndarray, axis := "", ddof := 0)
     {
         if !(ndarray is numahk.ndarray)
@@ -1614,14 +1614,85 @@ class numahk extends numahk_const
         length_c := c_array.array_product(shape)
         return numahk.ndarray(new_data, numahk.float64, , true, length_c).resize(shape)
     }
-    
+
     static zeros(shape, dtype := numahk.float64)
     {
         return numahk.nums(0, shape, dtype)
     }
-    
+
     static zeros_like(ndarray, dtype := ndarray.dtype)
     {
         return numahk.nums_like(0, ndarray, dtype)
+    }
+
+    static bincount(ndarray, weights := "", minlength := 0)
+    {
+        if !(ndarray is numahk.ndarray)
+            ndarray := numahk.ndarray(ndarray)
+
+        if ndarray.ndim != 1
+            throw error("ValueError: Input array must be 1 dimensional")
+
+        dtype := ndarray.dtype
+        dtype := numahk.%dtype%
+
+        ; 确保输入是整数类型
+        if (dtype != numahk.int8) && (dtype != numahk.int16) && (dtype != numahk.int32) && (dtype != numahk.int64)
+            && (dtype != numahk.uint8) && (dtype != numahk.uint16) && (dtype != numahk.uint32) && (dtype != numahk.uint64)
+            throw error("ValueError: Input array must be of integer type")
+
+        ; 检查数组中是否有负数
+        min_val := numahk.min(ndarray)
+        if min_val < 0
+            throw error("ValueError: Input array must be non-negative integers")
+
+        ; 计算输出数组的长度
+        max_val := numahk.max(ndarray)
+        out_size := max(max_val + 1, minlength)
+
+        ; 创建结果数组
+        result := numahk.zeros(out_size, numahk.int64)
+
+        ; 将ndarray展平为一维数组
+        flat_data := []
+        numahk.ravel_to_array(ndarray, &flat_data)
+
+        ; 计算每个值的出现次数
+        for _, value in flat_data
+            result[value + 1] += 1
+
+        ; 处理权重参数
+        if weights != ""
+        {
+            if !(weights is numahk.ndarray)
+                weights := numahk.ndarray(weights)
+
+            if weights.shape[1] != ndarray.shape[1]
+                throw error("ValueError: weights and input array have different lengths")
+
+            ; 重置结果数组为浮点类型
+            result := numahk.zeros(out_size, numahk.float64)
+
+            ; 带权重的计数
+            weight_data := []
+            numahk.ravel_to_array(weights, &weight_data)
+
+            for i, value in flat_data
+                result[value + 1] += weight_data[i]
+        }
+
+        return result
+    }
+
+    ; 辅助函数：将ndarray展平并转换为AHK数组
+    static ravel_to_array(ndarray, &output_array)
+    {
+        ; 获取展平后的数据
+        flat := ndarray.ravel()
+        flat_size := flat.size
+
+        ; 将数据转换为AHK数组
+        for i in 1..flat_size
+            output_array.push(flat[i])
     }
 }

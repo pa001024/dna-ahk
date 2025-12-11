@@ -27,7 +27,7 @@
 #Include <WinAPI\Gdi32>
 
 if (!A_IsCompiled && A_LineFile = A_ScriptFullPath)
-  FindText().Gui("Show")
+  FindText().gui("Show")
 
 
 ;===== 复制下面的函数和类到你的代码中仅仅一次 =====

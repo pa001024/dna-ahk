@@ -3,18 +3,49 @@
  * [opencv_world*.dll](https://github.com/opencv/opencv/releases)
  * @tutorial https://docs.opencv.org/4.x/index.html
  ***********************************************************************/
-#DllLoad opencv_world490.dll
-#DllLoad autoit_opencv_com490.dll
+
 #Include <CGdip>
-Dllcall("SetDllDirectory", "Str", A_ScriptDir)
 
-Try
+
+try
 	ComObject("OpenCV.CV")
-Catch
+catch {
+	(() {
+		init := DllCall('LoadLibrary', 'str', A_LineFile '\..\autoit_opencv_com490.dll', 'ptr')
+		if (!init)
+			Throw OSError()
+	})()
 	DllCall("autoit_opencv_com490.dll\DllInstall", "Int", 1, "WStr", A_IsAdmin = 0 ? "user" : "", "cdecl")
-
+}
 Class None {
 
+}
+
+
+/**
+ * 窗口截图并转换为Mat
+ * 
+ * @return {Mat}
+ */
+capWindowMat() {
+	global hwnd
+	WinGetClientPos , , &wid, &hei, hwnd
+	pBits := 0
+	hhdc := GetDC(hwnd)
+	chdc := CreateCompatibleDC(hhdc)  ; 【调色板函数?】参数hhdc可删除
+	; pBits 指向变量的指针，该变量接收指向 DIB 位值位置的指针
+	hbm := CreateDIBSection(wid, hei, chdc, 24, &pBits)  ; 返回hBitmap
+	obm := SelectObject(chdc, hbm)
+	BitBlt(chdc, 0, 0, wid, hei, hhdc, 0, 0, 0xCC0020)
+	val := (wid * 3 + 3) & -4  ; Channels := 3 ; 通道
+	img := cv2.MAT_Init().create(hei, wid, 16, pBits, val)
+	mat := toMat(cv2.MAT(), img.clone())
+	SelectObject(chdc, obm)
+	ReleaseDC(hhdc)
+	DeleteObject(hbm)
+	DeleteDC(hhdc)
+	DeleteDC(chdc)
+	return mat
 }
 
 DllCall("QueryPerformanceFrequency", "Int64*", &CLOCKS_PER_SEC := 0)
@@ -23,10 +54,6 @@ clock() {
 	DllCall("QueryPerformanceCounter", "Int64*", &Time := 0)
 
 	return Time
-}
-
-getCurrentDirectory() {
-	return A_ScriptDir
 }
 
 int(num) {

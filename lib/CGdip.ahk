@@ -306,6 +306,11 @@ class CGdip
 			return DllCall("gdiplus\GdipSetSmoothingMode", "Ptr", this, "int", SmoothingMode)
 		}
 
+		SetPixelOffsetMode(mode := 0) {
+			return DllCall("gdiplus\GdipSetPixelOffsetMode", "Ptr", this, "int", mode)
+		}
+
+
 		SetCompositingMode(CompositingMode := 0) {
 			; CompositingModeSourceOver = 0 (blended)
 			; CompositingModeSourceCopy = 1 (overwrite)
@@ -421,7 +426,7 @@ class CGdip
 				Stride := NumGet(dib, 12, "Int"), Bits := NumGet(dib, 20 + (A_PtrSize = 8 ? 4 : 0))	; padding
 				DllCall("gdiplus\GdipCreateBitmapFromScan0", "int", Width, "int", Height, "int", Stride, "int", 0x26200A, "Ptr", Bits, "Ptr*", &pBitmapOld := 0)
 				DllCall("gdiplus\GdipCreateBitmapFromScan0", "int", Width, "int", Height, "int", 0, "int", 0x26200A, "Ptr", 0, "Ptr*", &pBitmap := 0)
-				DllCall("gdiplus\GdipGetImageGraphicsContext", "Ptr", pBitmap, "Ptr*", &G := 0)
+				; DllCall("gdiplus\GdipGetImageGraphicsContext", "Ptr", pBitmap, "Ptr*", &G := 0)
 				G := CGdip.Graphics.FromBitmap(pBitmap), G.DrawImage(pBitmapOld, 0, 0, Width, Height, 0, 0, Width, Height)
 				SelectObject(hdc, obm), DeleteObject(hbm), DeleteDC(hdc)
 				DllCall("gdiplus\GdipDisposeImage", "Ptr", pBitmapOld)
@@ -459,7 +464,7 @@ class CGdip
 			BitBlt(chdc, 0, 0, w, h, hhdc, x, y, Raster)
 			ReleaseDC(hhdc)
 			DllCall("gdiplus\GdipCreateBitmapFromHBITMAP", "Ptr", hbm, "Ptr", 0, "Ptr*", &pBitmap := 0)
-			SelectObject(chdc, obm), DeleteObject(hbm), DeleteDC(hhdc), DeleteDC(chdc)
+			SelectObject(chdc, obm), DeleteObject(hbm), DeleteDC(chdc)
 			return CGdip.Bitmap(pBitmap)
 		}
 
@@ -607,7 +612,7 @@ class CGdip
 							ep := EncoderParameters.ptr + elem - A_PtrSize
 							NumPut("uptr", 1, ep)
 							NumPut("uint", 4, ep, 20 + A_PtrSize)
-							NumPut("uint", quality, NumGet(ep + 24 + A_PtrSize, "uptr"))
+							NumPut("uint", Quality, NumGet(ep + 24 + A_PtrSize, "uptr"))
 							break
 						}
 					}
@@ -868,6 +873,14 @@ class CGdip
 				Pens.Delete(this.prop)
 			}
 			DllCall("gdiplus\GdipDeletePen", "Ptr", this)
+		}
+
+		SetLineJoin(linejoin := 0) {
+			return DllCall("gdiplus\GdipSetPenLineJoin", "Ptr", this, "int", linejoin)
+		}
+
+		SetStartCap(startcap := 0) {
+			return DllCall("gdiplus\GdipSetPenStartCap", "Ptr", this, "int", startcap)
 		}
 
 		static Create(ARGB, w) {

@@ -13,7 +13,7 @@ class GuiMain {
     }
 
     static ShowMain() {
-        if DNAGui.visible {
+        if DNAGui.visible() {
             DNAGui.Close()
             IniWrite(0, "dna-ahk.ini", "gui", "show")
         } else {

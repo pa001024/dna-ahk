@@ -2265,12 +2265,12 @@ class cv2 extends cv2Constants {
 	static Mat() => cv.Mat()
 
 	static cvtColor(src, code, dstCn := cv.MAT()) {
-		return cv.CvtColor(src, code, dstCn)
+		return cv.cvtColor(src, code, dstCn)
 	}
-	
+
 	static warpPolar(src, dsize, center, maxRadius, flags := cv2.WARP_POLAR_LINEAR) {
 		dst := this.Mat()
-		cv.WarpPolar(src, dsize, center, maxRadius, flags, dst)
+		cv.warpPolar(src, dsize, center, maxRadius, flags, dst)
 		return dst
 	}
 
@@ -2292,7 +2292,132 @@ class cv2 extends cv2Constants {
 			wname := "Default"
 		}
 		try {
-			cv.Imshow(wname, img)
+			cv.imshow(wname, img)
 		}
+	}
+
+	static imread(filename, flags := cv2.IMREAD_COLOR) {
+		return cv.imread(filename, flags)
+	}
+
+	static imwrite(filename, img, params := []) {
+		return cv.imwrite(filename, img, params)
+	}
+
+	static resize(src, dsize, fx := 0, fy := 0, interpolation := cv2.INTER_LINEAR) {
+		dst := this.Mat()
+		cv.resize(src, dst, dsize, fx, fy, interpolation)
+		return dst
+	}
+
+	static flip(src, flipCode) {
+		dst := this.Mat()
+		cv.flip(src, dst, flipCode)
+		return dst
+	}
+
+	static rotate(src, rotateCode) {
+		dst := this.Mat()
+		cv.rotate(src, dst, rotateCode)
+		return dst
+	}
+
+	static blur(src, ksize) {
+		dst := this.Mat()
+		cv.blur(src, dst, ksize)
+		return dst
+	}
+
+	static GaussianBlur(src, ksize, sigmaX, sigmaY := 0, borderType := cv2.BORDER_DEFAULT) {
+		dst := this.Mat()
+		cv.GaussianBlur(src, dst, ksize, sigmaX, sigmaY, borderType)
+		return dst
+	}
+
+	static medianBlur(src, ksize) {
+		dst := this.Mat()
+		cv.medianBlur(src, dst, ksize)
+		return dst
+	}
+
+	static Scharr(src, ddepth, dx, dy, scale := 1, delta := 0) {
+		dst := this.Mat()
+		cv.Scharr(src, dst, ddepth, dx, dy, scale, delta)
+		return dst
+	}
+
+	static threshold(src, thresh, maxval, type) {
+		dst := this.Mat()
+		retval := cv.Threshold(src, dst, thresh, maxval, type)
+		return [retval, dst] ; 返回阈值和处理后的图像
+	}
+
+	static findContours(image, mode, method) {
+		contours := []
+		hierarchy := this.Mat()
+		cv.findContours(image, contours, hierarchy, mode, method)
+		return [contours, hierarchy] ; 返回轮廓和层次结构
+	}
+
+	static rectangle(img, pt1, pt2, color, thickness := 1, lineType := 8, shift := 0) {
+		return cv.rectangle(img, pt1, pt2, color, thickness, lineType, shift)
+	}
+
+	static circle(img, center, radius, color, thickness := 1, lineType := 8, shift := 0) {
+		return cv.circle(img, center, radius, color, thickness, lineType, shift)
+	}
+
+	static line(img, pt1, pt2, color, thickness := 1, lineType := 8, shift := 0) {
+		return cv.line(img, pt1, pt2, color, thickness, lineType, shift)
+	}
+
+	; 位运算函数
+	static bitwise_and(src1, src2, mask := "") {
+		dst := this.Mat()
+		cv.bitwise_and(src1, src2, dst, mask)
+		return dst
+	}
+
+	static bitwise_or(src1, src2, mask := "") {
+		dst := this.Mat()
+		cv.bitwise_or(src1, src2, dst, mask)
+		return dst
+	}
+
+	static bitwise_not(src, mask := "") {
+		dst := this.Mat()
+		cv.bitwise_not(src, dst, mask)
+		return dst
+	}
+
+	static bitwise_xor(src1, src2, mask := "") {
+		dst := this.Mat()
+		cv.bitwise_xor(src1, src2, dst, mask)
+		return dst
+	}
+
+	; 算术运算函数
+	static add(src1, src2, mask := "", dtype := -1) {
+		dst := this.Mat()
+		cv.add(src1, src2, dst, mask, dtype)
+		return dst
+	}
+
+	static subtract(src1, src2, mask := "", dtype := -1) {
+		dst := this.Mat()
+		cv.subtract(src1, src2, dst, mask, dtype)
+		return dst
+	}
+
+	static multiply(src1, src2, scale := 1.0, dtype := -1) {
+		dst := this.Mat()
+		cv.multiply(src1, src2, dst, scale, dtype)
+		return dst
+	}
+
+	static divide(src1, src2, scale := 1.0, dtype := -1) {
+		dst := this.Mat()
+		cv.divide(src1, src2, dst, scale, dtype)
+		return dst
 	}
 }
