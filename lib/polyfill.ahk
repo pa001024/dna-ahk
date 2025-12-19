@@ -9,6 +9,7 @@ isFunction(_obj) => _obj is Func
 isPrimitive(_obj) => _obj is Primitive
 
 Array.DefineProp('from', { call: Array_From })
+Array.DefineProp('fromCount', { call: Array_FromCount })
 Array.DefineProp('isArray', { call: isArray })
 
 arrProto := Array.Prototype
@@ -37,6 +38,15 @@ arrProto.DefineProp("min", { call: Array_Min })
 arrProto.DefineProp("slice", { call: Array_Slice })
 arrProto.DefineProp("splice", { call: Array_Splice })
 arrProto.DefineProp("toString", { call: Array_ToString })
+arrProto.DefineProp("sort", { call: Array_Sort })
+
+
+Array_FromCount(this, count, val := 0) {
+    arr := []
+    loop count
+        arr.Push(val)
+    return arr
+}
 
 ; 静态方法从字符串或数组创建一个新的**深拷贝**的数组实例。
 Array_From(this, arrayLike, mapFn?) {
@@ -350,6 +360,38 @@ Array_Splice(arr, start, deleteCount, itemsToAdd*) {
     arr.push(restItems*)
     ; 返回被删除的元素
     return deletedItems
+}
+
+Array_Sort(this, compareFn?) {
+    if !IsSet(compareFn)
+        compareFn := (a, b) => a - b
+    ; 快速排序核心函数
+    QuickSort(arr, left, right, cmp) {
+        if left >= right {
+            return
+        }
+        pivot := arr[left]
+        i := left, j := right
+        while i < j {
+            while i < j && cmp(arr[j], pivot) >= 0 {
+                j--
+            }
+            arr[i] := arr[j]
+            while i < j && cmp(arr[i], pivot) <= 0 {
+                i++
+            }
+            arr[j] := arr[i]
+        }
+        arr[i] := pivot
+        QuickSort(arr, left, i - 1, cmp)
+        QuickSort(arr, i + 1, right, cmp)
+    }
+
+    ; 调用快速排序
+    if this.Length > 1 {
+        QuickSort(this, 1, this.Length, compareFn)
+    }
+    return this
 }
 
 DefProp := {}.DefineProp

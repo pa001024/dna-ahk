@@ -610,7 +610,7 @@ class BitmapBuffer {
 
 	; cvt2CV2Mat
 	cvtMat() {
-		if (!IsSet(toMat)) {
+		if (!IsSet(toMat) || !IsSet(cv2)) {
 			return
 		}
 		bmp := this.cvtBytes(3)

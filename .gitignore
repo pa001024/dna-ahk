@@ -28,3 +28,4 @@ Cargo.lock
 __pycache__/
 dna-ahk.ini
 *.png
+token
