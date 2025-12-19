@@ -1,25 +1,24 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Force
 #Include <RapidOcr/RapidOcr>
-#Include <wincapture/wincapture>
+#Include <Capture>
 #Include <polyfill>
 #Include <JSON>
 
 capWindow(hwnd) {
-    static wgc := 0
-    if (!wgc)
-        wgc := wincapture.WGC(hwnd)
-    return wgc.capture(1)
+    static cap := 0
+    static ihwnd := 0
+    if (!cap || ihwnd != hwnd) {
+        cap := Capture(hwnd)
+        ihwnd := hwnd
+    }
+    return cap.Capture()
 }
 readText(x1, y1, x2, y2, hwnd) {
     static ocr := 0
     if (!ocr)
         ocr := RapidOcr({ models: A_ScriptDir '\lib\RapidOcr\models' })
     bmp := capWindow(hwnd).range(x1, y1, x2, y2)
-    ; bmp.save("debug.png") ; 仅为调试使用
-    ; img := cv.imread(A_ScriptDir '\debug.png')
-    ; cv.imshow('img', img)
-    ; return ocr.ocr_from_file("debug.png")
     return ocr.ocr_from_bitmapdata(bmp.info)
 }
 ; ========== 核心函数：GetCloseMatches（匹配相似文本） ==========
@@ -155,6 +154,7 @@ class GrabGui {
         this.cb := () => this.Grab()
     }
     Start() {
+        win := WinExist("jjj")
         if (this.btn.Text = "开始抓取") {
             this.btn.Text := "停止抓取"
             SetTimer(this.cb, 1000)
@@ -194,14 +194,15 @@ class GrabGui {
         return rst.length > 0 ? rst[1] : ""
     }
     lastReport := ""
-    Report(missionsArr) {
+    Report(missions) {
         url := "https://xn--chq26veyq.icu/graphql"
-        data := JSON.stringify({ mission: missionsArr }, 0)
+        data := JSON.stringify(missions)
         if (this.lastReport = data)
             return
         this.lastReport := data
+        ; MsgBox data
         query := 'mutation($token:String!$missions:[[String!]!]!){addMissionsIngame(token:$token server:"cn" missions:$missions){missions createdAt}}'
-        rst := gqlQuery(url, query, { token: token, missions: missionsArr })
+        rst := gqlQuery(url, query, { token: token, missions: missions })
     }
 }
 
