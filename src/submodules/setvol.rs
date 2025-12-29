@@ -1,6 +1,4 @@
-use std::os::raw::{c_float, c_int};
 use widestring::U16CString;
-use windows::Win32::Graphics::Gdi::HBITMAP;
 use windows::Win32::Media::Audio::{
     EDataFlow, ERole, IAudioSessionControl2, IAudioSessionManager2, ISimpleAudioVolume,
 };

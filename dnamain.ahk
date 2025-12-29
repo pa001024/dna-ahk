@@ -9,38 +9,28 @@ SetTitleMatchMode 3
 SetCapsLockState 0
 SetWinDelay 20
 CoordMode "Mouse", "Client"
+CoordMode "Pixel", "Client"
 
 #Include lib.ahk
 #Include Hotkey\basic.ahk
 #Include Hotkey\short.ahk
 #Include Gui\gui.ahk
-#Include <MouseHook>
+; #Include <console>
 
 
-{
-    dx := 0, dy := 0
-    lx := -1, ly := -1
-    mh := MouseHook((*) {
-        global dx, dy, lx, ly
-        if mh.Action == "Move" {
-            dx := lx == -1 ? dx : dx + mh.x - lx, dy := ly == -1 ? dy : dy + mh.y - ly
-            msg dx ", " dy
-            lx := mh.x, ly := mh.y
-        }
-        return false
-    })
-    F3:: {
-        global dx, dy, lx, ly
-        if mh.Ptr == 0 {
-            dx := 0, dy := 0
-            mh.Start()
-        }
-        else {
-            msg dx ", " dy
-            A_Clipboard := "xy " dx ", " dy
-            mh.Stop()
+F3:: {
+    f() {
+        if cc(854, 611, "000000") {
+            ; console.log("010101")
+            MyVJoy.PressY(1000)
+            MyVJoy.PressA(1000)
+        } else {
+            ; console.log("else")
+            MyVJoy.PressLBX()
+            MyVJoy.PressA()
         }
     }
+    triggerLoop("自动下一波", f, 2000)
 }
 
 #HotIf WinActive("ahk_exe EM-Win64-Shipping.exe")
@@ -113,31 +103,8 @@ capmod() {
     A_Clipboard := item
 }
 
-; F5:: switchspeed()
-switchspeed() {
-    CoordMode "Mouse", "Client"
-    Send "{F11 Down}"
-    s 30
-    Send "{F11 Up}"
-    Send "{LAlt Down}"
-    s 30
-    Click 1286, 110
-    s 300
-    Send "{LAlt Up}"
-    Send "{F11 Down}"
-    s 30
-    Send "{F11 Up}"
-}
 
 #HotIf
-
-checkSize() {
-    WinGetClientPos &x, &y, &w, &h, hwnd
-    WinGetPos &wx, &wy, &ww, &wh, hwnd
-    if (w != 1600 or h != 900) {
-        WinMove(0, 0, 1600 + ww - w, 900 + wh - h, hwnd)
-    }
-}
 
 openMenu() {
     while not cc(1482, 805, "FFFFFF") {

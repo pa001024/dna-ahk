@@ -4,20 +4,11 @@ use opencv::{
     prelude::*,
 };
 use std::mem::zeroed;
-use std::os::raw::{c_float, c_int};
-use widestring::U16CString;
 use windows::Win32::Graphics::Gdi::{
     BITMAP, BITMAPINFO, BITMAPINFOHEADER, CreateCompatibleDC, DIB_RGB_COLORS, DeleteDC, GetDIBits,
     GetObjectW, HBITMAP, HDC, HGDIOBJ, RGBQUAD, SelectObject,
 };
-use windows::Win32::Media::Audio::{
-    EDataFlow, ERole, IAudioSessionControl2, IAudioSessionManager2, ISimpleAudioVolume,
-};
-use windows::Win32::Media::Audio::{IMMDeviceEnumerator, MMDeviceEnumerator};
-use windows::Win32::System::Com::{
-    CLSCTX_ALL, CoCreateInstance, CoInitialize, CoTaskMemFree, CoUninitialize,
-};
-use windows::core::{Error, Interface, Result};
+use windows::core::{Error, Result};
 
 // 定义一个错误类型转换函数
 fn create_error(message: &str) -> windows::core::Error {

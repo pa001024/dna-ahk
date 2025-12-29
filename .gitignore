@@ -12,8 +12,6 @@ Cargo.lock
 *~
 
 # Windows specific files
-*.exe
-*.dll
 *.lib
 *.pdb
 

@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Force
 
-
+#Include <Base64>
 class Capture {
     static refCount := 0
     __New(hwnd := 0) {
@@ -243,5 +243,41 @@ class ABitmap {
         r := DllCall("gdiplus\GdipSaveImageToFile", "ptr", pBitmap, "ptr", StrPtr(sOutput), "ptr", pCodec, "uint", 0)
         DllCall("gdiplus\GdipDisposeImage", 'uptr', pBitmap)
         return r ? -5 : 0
+    }
+    base64() {
+        this.save(sOutput := A_Temp "\__Capture__.png")
+        buf := FileRead(sOutput, "RAW")
+        sBase64 := Base64.Encode(buf)
+        FileDelete(sOutput)
+        return sBase64
+    }
+
+    static fromFile(sFile) {
+        ; 使用GDI+加载图像
+        hResult := DllCall("gdiplus\GdipCreateBitmapFromFile", "ptr", StrPtr(sFile), "ptr*", &pBitmap)
+        if (hResult != 0) {
+            throw Error("Failed to create bitmap from file", -1)
+        }
+
+        ; 从GpBitmap创建ABitmap对象
+        result := this.fromGpBitmap(pBitmap)
+
+        ; 清理资源
+        DllCall("gdiplus\GdipDisposeImage", "ptr", pBitmap)
+
+        return result
+    }
+
+    static fromBase64(sBase64) {
+        sBase64 := Base64.Decode(sBase64)
+        sTempFile := A_Temp "\__base64_image__.png"
+        buf := FileOpen(sTempFile, "w")
+        buf.Write(sBase64)
+        buf.Close()
+        try {
+            return this.fromFile(sTempFile)
+        } finally {
+            FileDelete(sTempFile)
+        }
     }
 }

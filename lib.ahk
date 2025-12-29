@@ -3,7 +3,7 @@
 #Include <WinAPI/Gdi32>
 #Include <WinAPI/User32>
 #Include <JSON>
-#Include <wincapture/wincapture>
+#Include <Capture>
 #Include <RapidOcr/RapidOcr>
 #Include <polyfill>
 ; #Include <opencv/opencv>
@@ -12,6 +12,7 @@
 #Include <FindText>
 #Include <BTree>
 #Include <core/core>
+#Include <VJoy/VJoy>
 #Include <RectOverlay>
 #Include <WebView2/WebView2>
 FT := FindTextClass()
@@ -20,6 +21,9 @@ FT := FindTextClass()
 global hwnd := WinExist("ahk_exe EM-Win64-Shipping.exe")
 if (hwnd) {
     FT.BindWindow(hwnd)
+    checkSize()
+} else {
+    MsgBox "未找到窗口"
 }
 ; 测试
 if A_ScriptFullPath = A_LineFile {
@@ -44,12 +48,20 @@ if A_ScriptFullPath = A_LineFile {
     ; MsgBox "预测旋转角度: " angle
 }
 
+checkSize() {
+    WinGetClientPos(&x, &y, &w, &h, hwnd)
+    WinGetPos(&wx, &wy, &ww, &wh, hwnd)
+    if (w != 1600 or h != 900) {
+        WinMove(0, 0, 1600 + ww - w, 900 + wh - h, hwnd)
+    }
+}
+
 ; 窗口截图
 capWindow() {
     static wgc
     if (!wgc)
-        wgc := wincapture.WGC(hwnd)
-    return wgc.capture(1)
+        wgc := Capture(hwnd)
+    return wgc.capture()
 }
 
 ; 识别文本
@@ -134,8 +146,9 @@ FindWindowBrightY(x, y, h, bmp, b, rev := false) {
     return -1
 }
 
-CheckWindowColor(x, y, v, s := 3) {
-    color := GetWindowColor(x, y)
+CheckWindowColor(x, y, v, s := 10) {
+    ; color := GetWindowColor(x, y)
+    color := SubStr(PixelGetColor(x, y), -6)
     return CompColor(color, v) < s
 }
 
@@ -177,6 +190,7 @@ triggerLoop(name, func, interval := 100) {
     if newVal {
         msg(name . "启动", 1000)
         SetTimer func, interval
+        func()
     }
     else {
         msg(name . "结束", 1000)

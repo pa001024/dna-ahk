@@ -77,9 +77,9 @@ CapsLock & c:: {
     MouseGetPos &x, &y
     pixelColor := SubStr(PixelGetColor(x, y), -6)
     if GetKeyState("Shift", "P")
-        A_Clipboard := "mc " x ", " y ", `"" pixelColor "`""
+        A_Clipboard := "if cc(" x ", " y ", `"" pixelColor "`") {}"
     else
-        A_Clipboard := "mc " x ", " y
+        A_Clipboard := "mc(" x ", " y ", `"" pixelColor "`")"
 }
 ; 取框 x1,y1,x2,y2
 CapsLock & t:: copyRangeText()
